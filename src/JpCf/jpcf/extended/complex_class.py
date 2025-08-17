@@ -23,7 +23,7 @@ class cif:
         np.array([val[2] for val in mapping])
     ]
 
-    def __init__(self, f, width, height, Cutoff):
+    def __init__(self, f, width, height, Cutoff, count_factor = 1.0):
 
         """This class allows you to apply a transformation to a section of the complex plane, 
         every time you apply a batch of transormations it returns a numpy image representation of the
@@ -40,6 +40,7 @@ class cif:
         self.f = f
         self.width, self.height = width, height
         self.Cutoff = Cutoff
+        self.count_factor = count_factor
 
         self.M = None # The current matrix of values
         self.M0 = None # The previous matrix of values
@@ -48,7 +49,6 @@ class cif:
         
         #NOTE: this is not exactly correct, for the sake of simplfication it is though ;)
         self.Final_1 = None # The previous point when the arg first became greater than Cutoff
-
 
         self.i = None
 
@@ -91,28 +91,28 @@ class cif:
                 self.M1 = np.array(self.M)
                 self.M = self.f(self.M, self.M0)
         
-        return (np.dstack([
-            cif.map_arr[2][(self.Count % 16).astype(np.int8)] * (self.Count != 0),
-            cif.map_arr[1][(self.Count % 16).astype(np.int8)] * (self.Count != 0),
-            cif.map_arr[0][(self.Count % 16).astype(np.int8)] * (self.Count != 0)
-            ]) 
-            +
-            (
-            np.dstack([
-            cif.map_arr[2][((self.Count+1) % 16).astype(np.int8)] * (self.Count != 0),
-            cif.map_arr[1][((self.Count+1) % 16).astype(np.int8)] * (self.Count != 0),
-            cif.map_arr[0][((self.Count+1) % 16).astype(np.int8)] * (self.Count != 0)
-            ]) -    
-            np.dstack([
-            cif.map_arr[2][(self.Count % 16).astype(np.int8)] * (self.Count != 0),
-            cif.map_arr[1][(self.Count % 16).astype(np.int8)] * (self.Count != 0),
-            cif.map_arr[0][(self.Count % 16).astype(np.int8)] * (self.Count != 0)
-            ])
+            return (np.dstack([
+                cif.map_arr[2][((self.Count*self.count_factor) % 16).astype(np.int8)] * (self.Count != 0),
+                cif.map_arr[1][((self.Count*self.count_factor) % 16).astype(np.int8)] * (self.Count != 0),
+                cif.map_arr[0][((self.Count*self.count_factor) % 16).astype(np.int8)] * (self.Count != 0)
+                ]) 
+                +
+                (
+                np.dstack([
+                cif.map_arr[2][(((self.Count+1)*self.count_factor) % 16).astype(np.int8)] * (self.Count != 0),
+                cif.map_arr[1][(((self.Count+1)*self.count_factor) % 16).astype(np.int8)] * (self.Count != 0),
+                cif.map_arr[0][(((self.Count+1)*self.count_factor) % 16).astype(np.int8)] * (self.Count != 0)
+                ]) -    
+                np.dstack([
+                cif.map_arr[2][((self.Count*self.count_factor) % 16).astype(np.int8)] * (self.Count != 0),
+                cif.map_arr[1][((self.Count*self.count_factor) % 16).astype(np.int8)] * (self.Count != 0),
+                cif.map_arr[0][((self.Count*self.count_factor) % 16).astype(np.int8)] * (self.Count != 0)
+                ])
+                )
+                * np.dstack([
+                    self.Final1,
+                    self.Final1,
+                    self.Final1
+                ])
             )
-             * np.dstack([
-                self.Final1,
-                self.Final1,
-                self.Final1
-            ])
-        )
     
