@@ -11,6 +11,20 @@ from ipywidgets import Image
 class interactable_canvas:
 
     def __init__(self,width,height,f,MAX_ITER=200,x0=-2,y0=-2,x1=2,y1=2):
+        """Initializes, and configures an ipython canvas :)
+        
+        To display the canvas, type "interactable_canvas(...).c" to the console
+
+        Args:
+            width (int): _description_
+            height (int): _description_
+            f (class): See extended.complex_class.cif and implement all of its functions #TODO: make a generic class
+            MAX_ITER (int, optional): The maximum number of iterations. Defaults to 200.
+            x0 (int, optional): The left xlim. Defaults to -2.
+            y0 (int, optional): The top ylim. Defaults to -2.
+            x1 (int, optional): The right xlim. Defaults to 2.
+            y1 (int, optional): The bottom ylim. Defaults to 2.
+        """
         self.c = Canvas(width = width, height = height)
         
         self.width, self.height = width, height
