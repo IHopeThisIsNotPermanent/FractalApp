@@ -1,0 +1,70 @@
+def frac_search():
+    agg_func = np.array([1,1,1,1,0,0,0,0,1,1,1,1,0,0,0,0]) #ODD/EVEN
+    CUTOFF = 100
+    strat_list = list(range(2 ** (2*9)))
+    random.shuffle(strat_list)
+    ret_lis = []
+    j = 0
+    jj = 0
+    for strat_i in strat_list:
+        j += 1
+        jj += 1
+        if j > 200:
+            j = 0
+            print(f'{jj}/{len(strat_list)}\nslns:{len(ret_lis)}\nmost rescent good boi:{ret_lis[-1] if len(ret_lis) > 0 else None}')
+            clear_output(wait = True)
+        strat = []
+        for i in range(2 * 9):
+            strat.append(strat_i%2)
+            strat_i = int(strat_i/2)
+        test_arr = np.random.choice([0,1], size=(16,16))
+        strat = np.array(strat)
+        nxt_agg = 0
+        predicted_nxt = None
+        good_dunski = True
+        for i in range(CUTOFF):
+            #Agg function
+            nxt_agg = agg_func[
+            (2**0)*test_arr[::2,::2]+
+            (2**1)*test_arr[1::2,::2]+
+            (2**2)*test_arr[1::2,1::2]+
+            (2**3)*test_arr[::2,1::2]
+            ]
+            if not predicted_nxt is None:
+                if (np.sum(np.abs(predicted_nxt-nxt_agg)) != 0):
+                    good_dunski = False
+                    break
+            
+            predicted_nxt  = strat[
+                    np.array([0,9])[nxt_agg] + (
+                    np.roll(nxt_agg,  1, 0) + 
+                    np.roll(nxt_agg, -1, 0) + 
+                    np.roll(nxt_agg,  1, 1) + 
+                    np.roll(nxt_agg, -1, 1) +
+                    
+                    np.roll(np.roll(nxt_agg,  1, 0),  1, 0) + 
+                    np.roll(np.roll(nxt_agg, -1, 0),  1, 1) + 
+                    np.roll(np.roll(nxt_agg,  1, 1), -1, 0) + 
+                    np.roll(np.roll(nxt_agg, -1, 1), -1, 1)
+                                            )]
+            for __ in range(2):
+                test_arr = strat[
+                    np.array([0,9])[test_arr] + (
+                    np.roll(test_arr,  1, 0) + 
+                    np.roll(test_arr, -1, 0) + 
+                    np.roll(test_arr,  1, 1) + 
+                    np.roll(test_arr, -1, 1) +
+                    
+                    np.roll(np.roll(test_arr,  1, 0),  1, 0) + 
+                    np.roll(np.roll(test_arr, -1, 0),  1, 1) + 
+                    np.roll(np.roll(test_arr,  1, 1), -1, 0) + 
+                    np.roll(np.roll(test_arr, -1, 1), -1, 1)
+                                            )]
+                
+        if good_dunski:
+            ret_lis.append(list(strat))
+    return ret_lis
+    
+a = frac_search()
+for x in a:
+    print([int(y) for y in x])
