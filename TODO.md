@@ -1,1 +1,1 @@
-- Update README to include steps for mac or linux too.
+- Update README to include steps for Mac or Linux too.
