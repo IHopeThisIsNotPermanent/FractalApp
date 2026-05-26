@@ -10,12 +10,12 @@ class cif:
     #AS PER https://stackoverflow.com/questions/16500656/which-color-gradient-is-used-to-color-mandelbrot-in-wikipedia#25816111
     #I'm not super creative and i think the Wikipeia one looks clean :)
     mapping = [
-    (66, 30, 15),(25, 7, 26),(9, 1, 47),
-    (4, 4, 73),(0, 7, 100),(12, 44, 138),
+    (0, 7, 100),(12, 44, 138),
     (24, 82, 177),(57, 125, 209),(134, 181, 229),
     (211, 236, 248),(241, 233, 191),(248, 201, 95),
     (255, 170, 0),(204, 128, 0),(153, 87, 0),
-    (106, 52, 3)
+    (106, 52, 3),(66, 30, 15),(25, 7, 26),(9, 1, 47),
+    (4, 4, 73)
     ]
     map_arr = [
         np.array([val[0] for val in mapping]),
@@ -30,11 +30,13 @@ class cif:
         section.
 
         Args:
-            f (lambda x, x0): A function that does some opation to two numpyarray with datatype 'complex'
+            f (lambda x, x0): A function that applies some operation to two numpy arrays with datatype 'complex', where x is the current update
+                and x0 is the complex plane.
             width (int): The width of the image in px
             height (int): The height of the image in px
             Cutoff (float): The value in which if the arg of the number goes above, we note the iteration it occured on.
-
+            count_factor (float): The factor we multiply the no. iterations by when we index our colour map, number>1 makes 
+                the colour bands closer, number<1 makes the colour bands further
         """
 
         self.f = f

@@ -10,7 +10,7 @@ from ipywidgets import Image
 
 class interactable_canvas:
 
-    def __init__(self,width,height,f,MAX_ITER=200,x0=-2,y0=-2,x1=2,y1=2):
+    def __init__(self, width, height, f, MAX_ITER=200, x0=-2, y0=-2, x1=2, y1=2):
         """Initializes, and configures an ipython canvas :)
         
         To display the canvas, type "interactable_canvas(...).c" to the console
@@ -18,7 +18,7 @@ class interactable_canvas:
         Args:
             width (int): _description_
             height (int): _description_
-            f (class): See extended.complex_class.cif and implement all of its functions #TODO: make a generic class
+            f (class): See extended.complex_class.cif and implement all of its functions 
             MAX_ITER (int, optional): The maximum number of iterations. Defaults to 200.
             x0 (int, optional): The left xlim. Defaults to -2.
             y0 (int, optional): The top ylim. Defaults to -2.
@@ -56,7 +56,7 @@ class interactable_canvas:
         #Lock appending to the states
         self.states_lock = threading.Lock()
 
-        self.states = []
+        self.states = [(self.Ox0,self.Oy0,self.Ox1,self.Oy1),]
 
         t=threading.Thread(target = self.draw)
         t.start()
@@ -64,6 +64,7 @@ class interactable_canvas:
     def draw(self):
 
         with self.increment_lock:
+            #This is what we use to stop the previous drawer.
             self.draw_switch += 1
             my_draw_switch = self.draw_switch
 
@@ -71,6 +72,7 @@ class interactable_canvas:
             BATCH = 20
             itr = 0
             self.f.start(self.x0,self.y0,self.x1,self.y1)
+            #check if there is another drawer waiting, or if this one is done :)
             while my_draw_switch == self.draw_switch and itr < self.MAX_ITER:
                 itr += BATCH
                 nxt_img_np = self.f.val(BATCH)
@@ -85,6 +87,7 @@ class interactable_canvas:
         DELTA = 3
         td = time.time() - self.down_time
         since_last_click_td = time.time() - self.prev_click_time
+        #If you have clicked within 3 pxs and within quick_click (0.5 secs) then you have doubled clicked!
         if abs(x - self.prev_pos[0]) <= DELTA and \
            abs(y - self.prev_pos[1]) <= DELTA and \
            td <= self.quick_click:
@@ -96,10 +99,13 @@ class interactable_canvas:
                 self.quick_clicks = 0
                 self.x0,self.y0,self.x1,self.y1 = self.Ox0,self.Oy0,self.Ox1,self.Oy1
                 with self.states_lock:
-                    self.states = []
+                    self.states = [(self.Ox0,self.Oy0,self.Ox1,self.Oy1),]
                 t=threading.Thread(target = self.draw)
                 t.start()
+        #otherwise we say you have clicked and dragged.
         else:
+            with self.states_lock:
+                self.states.append((self.x0,self.y0,self.x1,self.y1))
             self.quick_clicks = 0
             xd = self.x1 - self.x0
             yd = self.y1 - self.y0
@@ -113,8 +119,6 @@ class interactable_canvas:
             self.y0 = py0 + yd * (Ly/self.height)
             self.x1 = px0 + xd * (Rx/self.width)
             self.y1 = py0 + yd * (Ry/self.height)
-            with self.states_lock:
-                self.states.append((self.x0,self.y0,self.x1,self.y1))
             t=threading.Thread(target = self.draw)
             t.start()
         self.prev_click_time = time.time()
